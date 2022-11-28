@@ -1,0 +1,113 @@
+	//#include <iostream>
+#include <fstream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include <string>
+#include <deque>
+#include <set>
+#include <map>
+#include <deque>
+#include <queue>
+#include <ctime>
+
+
+
+using namespace std;
+
+ifstream cin("input.txt");
+ofstream cout("output.txt");
+vector <int> maks, q;
+
+
+int binSearch(int l, int r, int key) {   // Запускаем бинарный поиск
+	while (l < r - 1) {                // Запускаем цикл
+		int m = (l + r) / 2;            // m — середина области поиска
+		if (maks[m] < key)
+			l = m;
+		else
+			r = m;
+	}
+	return r;
+}
+int main() {
+	int n;
+	cin >> n;
+	q.resize(n);
+	maks.resize(n);
+	for (int i = 0; i < n; ++i)
+		cin >> maks[i];
+	for (int i = 0; i < n; ++i)
+		cin >> q[i];
+
+	sort(maks.begin(), maks.end());
+	sort(q.begin(), q.end());
+	reverse(q.begin(), q.end());
+	//reverse(maks.begin(), maks.end());
+	/*
+	vector <int> left;
+	int j = 0;
+	int bad = 0;
+	int ans = 0;
+	int i = 0;
+	for (; i < n && j < n; ++i) {
+		while (j < n && maks[i] <= q[j]) {
+			left.push_back(q[j]);
+			j++;
+		}
+		if (j >= n)
+			break;
+		ans++;
+		j++;
+	}
+	j = 0;
+	for (; i < n; ++i) {
+		while (j < left.size() && left[j] > maks[i]) {
+			bad++;
+			j++;
+		}
+		if (j >= left.size())
+			break;
+		j++;
+	}
+	cout << ans - bad;*/
+	
+	int ans = 0;
+	vector <bool> usedM(n, false);
+	vector <bool> usedQ(n, false);
+	for (int i = 0; i < n; ++i) {
+		int l = 0;
+		int r = n;
+		int mid = (l + r) / 2;
+		int start = binSearch(l, r, q[i]) - 1;
+		for (int j = start; !usedQ[i] && j < n; ++j) {
+			if (!usedM[j] && q[i] < maks[j])
+			{
+				ans++;
+				usedM[j] = true;
+				usedQ[i] = true;
+				break;
+			}
+		}
+	}
+	for (int i = 0; i < n; ++i) {
+		int l = 0;
+		int r = n;
+		int mid = (l + r) / 2;
+		int start = binSearch(l, r, q[i]) - 1;
+		for (int j = start; !usedQ[i] && j < n; ++j) {
+			if (!usedM[j] && q[i] == maks[j])
+			{
+				usedM[j] = true;
+				break;
+			}
+		}
+	}
+	int bad = 0;
+	for (int i = 0; i < n; ++i)
+		if (!usedM[i])
+			bad++;
+	cout << ans - bad;
+	
+	return 0;
+}
